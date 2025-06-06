@@ -1,12 +1,76 @@
 {
-  "members": [],
-  "waitingList": [],
-  "winningNumbers": [7, 12, 25, 33, 41, 55, 3, 8],
-  "numbersHistory": [],
-  "currentWinnings": 0,
-  "winningsDate": "",
-  "drawingDate": "",
+  "members": [
+    {
+      "id": 1749180015260,
+      "name": "Wayne Rigley",
+      "email": "",
+      "phone": "226-506-1254",
+      "joinDate": "6/5/2025",
+      "paidThisWeek": false,
+      "weeklyPaymentHistory": {
+        "2025-01-01": false
+      }
+    },
+    {
+      "id": 1749180024738,
+      "name": "Heather Fleming",
+      "email": "",
+      "phone": "",
+      "joinDate": "6/5/2025",
+      "paidThisWeek": true,
+      "weeklyPaymentHistory": {
+        "2025-01-01": true
+      }
+    }
+  ],
+  "waitingList": [
+    {
+      "id": 1749180034703,
+      "name": "Brad Yoell",
+      "email": "",
+      "phone": "",
+      "addedDate": "6/5/2025"
+    }
+  ],
+  "winningNumbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    12
+  ],
+  "numbersHistory": [
+    {
+      "numbers": [
+        7,
+        12,
+        25,
+        33,
+        41,
+        55,
+        3,
+        8
+      ],
+      "date": "6/5/2025",
+      "winnings": 100,
+      "timestamp": 1749180049930
+    }
+  ],
+  "currentWinnings": 100,
+  "winningsDate": "2025-06-02",
+  "drawingDate": "2025-06-02",
   "currentWeekStart": "2025-01-01",
-  "tickets": [],
-  "lastModified": 1749180000000
+  "tickets": [
+    {
+      "id": 1749180088100,
+      "url": "https://drive.google.com/file/d/1jcIzVIBvLXSCkNZz0cPLNXS7RpATQy5H/view?usp=sharing",
+      "week": "7-JAN-2020",
+      "addedDate": "6/5/2025",
+      "ticketNumber": 1
+    }
+  ],
+  "lastModified": 1749180101396
 }
