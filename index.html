@@ -844,7 +844,9 @@
         const GITHUB_REPO = "amico-lottery-pool";
         const DATA_FILE_PATH = "data/lottery-data.json";
         const GITHUB_TOKEN = "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";
-        
+
+        console.log("Token being used:", GITHUB_TOKEN);
+        console.log("Full auth header:", `token ${GITHUB_TOKEN}`);
         // Initialize the app
         async function init() {
             console.log('Initializing app...');
