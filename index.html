@@ -843,7 +843,7 @@
         const GITHUB_OWNER = "waynerigley";
         const GITHUB_REPO = "amico-lottery-pool";
         const DATA_FILE_PATH = "data/lottery-data.json";
-        const GITHUB_TOKEN = "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"; // You'll need to replace this
+        const GITHUB_TOKEN = "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"; // You'll need to replace this
         
         // Initialize the app
         async function init() {
@@ -1246,7 +1246,7 @@
             if (confirm('Remove from waiting list?')) {
                 waitingList = waitingList.filter(p => p.id !== id);
                 updateDisplay();
-                await saveDataToGitHub();
+                await saveDataTo();
             }
         }
 
