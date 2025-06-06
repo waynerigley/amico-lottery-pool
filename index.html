@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amico AI - Live Lottery Pool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .sync-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-access {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-access:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .admin-access.active {
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2ecc71;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .admin-section {
+            border: 2px dashed #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+            display: none;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .admin-section.unlocked {
+            display: block;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #4CAF50;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .winnings-section {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .winnings-amount {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .winnings-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px;
+            font-size: 1.1em;
+            text-align: center;
+            color: #333;
+        }
+
+        .winning-numbers {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .number-ball {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .bonus {
+            background: linear-gradient(135deg, #FF4757, #FF3838) !important;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-group input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .member-list, .waiting-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .member-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .member-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-color: #4CAF50;
+        }
+
+        .member-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .member-info {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .waiting-list .member-card {
+            background: linear-gradient(135deg, #fff3cd, #ffeeba);
+            border-color: #ffeeba;
+        }
+
+        .promote-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+
+        .payment-status {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .payment-status.paid {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .payment-status.unpaid {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .payment-controls {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payment-checkbox {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .payment-label {
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .tickets-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .ticket-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .ticket-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .ticket-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .ticket-info {
+            padding: 15px;
+        }
+
+        .ticket-week {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .ticket-number {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .remove-ticket-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .history-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 5px solid #6c757d;
+        }
+
+        .history-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-numbers {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .history-ball {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .history-ball.bonus {
+            background: linear-gradient(135deg, #FF4757, #FF3838);
+        }
+
+        .history-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .history-winnings {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .weekly-management {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .weekly-management h3 {
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .weekly-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .weekly-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .weekly-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .current-week {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close-modal:hover {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .sync-status, .admin-access {
+                position: relative;
+                top: 0;
+                left: 0;
+                right: 0;
+                margin: 10px auto;
+                justify-content: center;
+            }
+        }
+
+        .share-section {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .share-section h3 {
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .share-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="admin-access" id="adminBtn">
+                <span>🔐</span>
+                <span id="adminText">Admin</span>
+            </button>
+            <h1>🎰 Amico AI</h1>
+            <p>Live Lottery Pool</p>
+            <div class="sync-status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">Live</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Important Notice -->
+            <div style="
+                background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                color: white;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 30px;
+                border-left: 5px solid #c44569;
+                box-shadow: 0 4px 12px rgba(238, 90, 36, 0.3);
+            ">
+                <h3 style="margin-bottom: 15px; color: white; display: flex; align-items: center; gap: 10px;">
+                    <span>⚠️</span>Important Notice
+                </h3>
+                <div style="line-height: 1.6; font-size: 0.95em;">
+                    <p style="margin-bottom: 12px;"><strong>To participate in this week's draw, please ensure payment of $10.00 CAD is made either in cash (hand-delivered) or via e-transfer to waynerigley@gmail.com (password: Amico123@) by Monday of each week.</strong></p>
+                    
+                    <p style="margin-bottom: 0;">Failure to make payment will be considered a withdrawal from the lottery pool, and you will automatically be placed in the Waiting List group. The Waiting List operates on a "first in, first out" basis.</p>
+                </div>
+            </div>
+
+            <!-- Admin Export/Import Section -->
+            <div class="admin-section">
+                <div class="share-section">
+                    <h3>📁 Data Backup & Restore</h3>
+                    <p style="margin-bottom: 15px;">Export your data before updating the site, then import it back to restore everything!</p>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button class="share-btn" onclick="exportData()">📥 Export Data</button>
+                        <button class="share-btn" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Weekly Management -->
+            <div class="admin-section">                
+                <div class="weekly-management">
+                    <h3>💳 Weekly Payment Management</h3>
+                    <div class="current-week" id="currentWeek">Current Week: Loading...</div>
+                    <p style="margin-bottom: 15px; opacity: 0.9;">Manage weekly payments and move unpaid members to waiting list</p>
+                    <div class="weekly-btns">
+                        <button class="weekly-btn" id="newWeekBtn">🗓️ Start New Week</button>
+                        <button class="weekly-btn" id="moveUnpaidBtn">⏳ Move Unpaid to Waiting List</button>
+                        <button class="weekly-btn" id="markAllPaidBtn">✅ Mark All as Paid</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics and Winnings -->
+            <div class="stats-winnings-container">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="memberCount">0</div>
+                        <div class="stat-label">Active Members</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="waitingCount">0</div>
+                        <div class="stat-label">Waiting List</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalCount">0</div>
+                        <div class="stat-label">Total People</div>
+                    </div>
+                </div>
+
+                <div class="winnings-section">
+                    <h2>💰 Latest Winnings</h2>
+                    <div class="winnings-amount" id="currentWinnings">$0.00</div>
+                    <div id="winningsDate" style="font-size: 1.1em; opacity: 0.9; margin-top: 10px;"></div>
+                    <div class="admin-section">
+                        <input type="number" class="winnings-input" id="winningsInput" placeholder="Enter winnings amount" step="0.01">
+                        <input type="date" class="winnings-input" id="winningsDateInput" style="width: auto;">
+                        <button class="btn" id="updateWinningsBtn" style="background: rgba(255,255,255,0.2); border: 2px solid white;">Update Winnings</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lottery Tickets Section -->
+            <div class="section">
+                <h2>🎫 Lottery Tickets</h2>
+                
+                <div class="admin-section">
+                    <div class="add-ticket-section">
+                        <h3>📎 Add New Ticket</h3>
+                        <p style="margin-bottom: 15px; opacity: 0.9;">Upload your ticket to an image host and paste the URL here</p>
+                        <div class="input-group" style="justify-content: center;">
+                            <input type="url" class="ticket-input" id="ticketUrlInput" placeholder="Image URL (imgur.com recommended)" style="flex: 1; max-width: 300px;">
+                            <input type="text" class="ticket-input" id="ticketWeekInput" placeholder="Week (e.g., Week of Jan 15, 2025)" style="flex: 0.7; max-width: 200px;">
+                            <button class="btn" id="addTicketBtn">🎫 Add Ticket</button>
+                        </div>
+                        <p style="font-size: 0.9em; opacity: 0.8; margin-top: 10px; text-align: center;">
+                            💡 <strong>Recommended:</strong> Upload to <strong>imgur.com</strong> for best results!
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="tickets-gallery" id="ticketsGallery">
+                    <div class="no-tickets">
+                        <p>No tickets uploaded yet</p>
+                        <p style="font-size: 0.9em; opacity: 0.7;">Tickets will appear here once added by admin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Modal -->
+            <div class="modal" id="imageModal">
+                <span class="close-modal" id="closeModal">&times;</span>
+                <div class="modal-content">
+                    <img class="modal-image" id="modalImage" src="" alt="Ticket Image">
+                </div>
+            </div>
+
+            <!-- Winning Numbers Section -->
+            <div class="section">
+                <h2 style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <span>🎱</span>Latest Winning Numbers
+                    </span>
+                    <span id="drawingDateDisplay" style="font-size: 0.8em; color: #666; font-weight: normal;"></span>
+                </h2>
+                <div class="winning-numbers" id="winningNumbers">
+                    <div class="number-ball">07</div>
+                    <div class="number-ball">12</div>
+                    <div class="number-ball">25</div>
+                    <div class="number-ball">33</div>
+                    <div class="number-ball">41</div>
+                    <div class="number-ball">55</div>
+                    <div class="number-ball">03</div>
+                    <div class="number-ball bonus">08</div>
+                </div>
+                <div class="admin-section">
+                    <div class="input-group">
+                        <input type="number" id="num1" placeholder="Number 1" min="1" max="49">
+                        <input type="number" id="num2" placeholder="Number 2" min="1" max="49">
+                        <input type="number" id="num3" placeholder="Number 3" min="1" max="49">
+                        <input type="number" id="num4" placeholder="Number 4" min="1" max="49">
+                        <input type="number" id="num5" placeholder="Number 5" min="1" max="49">
+                        <input type="number" id="num6" placeholder="Number 6" min="1" max="49">
+                        <input type="number" id="num7" placeholder="Number 7" min="1" max="49">
+                        <input type="number" id="bonus" placeholder="Bonus" min="1" max="49">
+                        <input type="date" id="drawingDate" placeholder="Drawing Date">
+                        <button class="btn" id="updateNumbersBtn">Update Numbers</button>
+                    </div>
+                </div>
+                
+                <div class="history-section">
+                    <h3>📊 Previous Drawings</h3>
+                    <div id="numbersHistory"></div>
+                </div>
+            </div>
+
+            <!-- Pool Members Section -->
+            <div class="section">
+                <h2><span>👥</span>Pool Members</h2>
+                <div class="admin-section">
+                    <div class="input-group">
+                        <input type="text" id="memberName" placeholder="Member Name">
+                        <input type="email" id="memberEmail" placeholder="Email (optional)">
+                        <input type="tel" id="memberPhone" placeholder="Phone (optional)">
+                        <button class="btn" id="addMemberBtn">Add Member</button>
+                    </div>
+                </div>
+                <div class="member-list" id="memberList"></div>
+            </div>
+
+            <!-- Waiting List Section -->
+            <div class="section">
+                <h2><span>⏳</span>Waiting List</h2>
+                <div class="admin-section">
+                    <div class="input-group">
+                        <input type="text" id="waitingName" placeholder="Name">
+                        <input type="email" id="waitingEmail" placeholder="Email (optional)">
+                        <input type="tel" id="waitingPhone" placeholder="Phone (optional)">
+                        <button class="btn" id="addWaitingBtn">Add to Waiting List</button>
+                    </div>
+                </div>
+                <div class="waiting-list" id="waitingList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GitHub Pages configuration for live data management
+        let isAdminUnlocked = false;
+        let members = [];
+        let waitingList = [];
+        let winningNumbers = [7, 12, 25, 33, 41, 55, 3, 8];
+        let numbersHistory = [];
+        let currentWinnings = 0;
+        let winningsDate = '';
+        let drawingDate = '';
+        let currentWeekStart = null;
+        let tickets = [];
+        let lastUpdate = 0;
+        
+        const ADMIN_PASSWORD = "W*yneR*gley2025!!@";
+        const GITHUB_OWNER = "waynerigley"; // You'll need to replace this
+        const GITHUB_REPO = "amico-lottery-pool"; // You'll need to replace this
+        const DATA_FILE_PATH = "data/lottery-data.json";
+        const GITHUB_TOKEN = "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"; // You'll need to replace this
+        
+        // Initialize the app
+        async function init() {
+            console.log('Initializing app...');
+            
+            // Initialize current week if not set
+            if (!currentWeekStart) {
+                currentWeekStart = new Date().toISOString().split('T')[0];
+            }
+            updateWeekDisplay();
+            
+            // Load data from GitHub
+            await loadDataFromGitHub();
+            updateDisplay();
+            
+            // Set up auto-refresh for non-admin users
+            if (!isAdminUnlocked) {
+                setInterval(checkForUpdates, 5000); // Check every 5 seconds
+            }
+        }
+
+        // Load data from GitHub
+        async function loadDataFromGitHub() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE_PATH}`, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Authorization': `token ${GITHUB_TOKEN}`
+                    },
+                    cache: 'no-cache'
+                });
+
+                if (response.ok) {
+                    const fileData = await response.json();
+                    const content = atob(fileData.content);
+                    const data = JSON.parse(content);
+                    
+                    loadDataFromObject(data);
+                    lastUpdate = Date.now();
+                } else if (response.status === 404) {
+                    // File doesn't exist, create it with default data
+                    await saveDataToGitHub();
+                }
+            } catch (error) {
+                console.error('Error loading data from GitHub:', error);
+                // Fallback to localStorage
+                loadDataFromLocalStorage();
+            }
+        }
+
+        // Save data to GitHub
+        async function saveDataToGitHub() {
+            if (!isAdminUnlocked) return;
+
+            const data = {
+                members,
+                waitingList,
+                winningNumbers,
+                numbersHistory,
+                currentWinnings,
+                winningsDate,
+                drawingDate,
+                currentWeekStart,
+                tickets,
+                lastModified: Date.now()
+            };
+
+            try {
+                // Get current file to get SHA (required for updates)
+                let sha = '';
+                try {
+                    const getResponse = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE_PATH}`, {
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Authorization': `token ${GITHUB_TOKEN}`
+                        }
+                    });
+                    
+                    if (getResponse.ok) {
+                        const fileData = await getResponse.json();
+                        sha = fileData.sha;
+                    }
+                } catch (e) {
+                    // File doesn't exist, will create new
+                }
+
+                // Update or create file
+                const content = btoa(JSON.stringify(data, null, 2));
+                const body = {
+                    message: `Update lottery data - ${new Date().toLocaleString()}`,
+                    content: content,
+                    branch: 'main'
+                };
+                
+                if (sha) {
+                    body.sha = sha;
+                }
+
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE_PATH}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save to GitHub');
+                }
+
+                // Also save to localStorage as backup
+                localStorage.setItem('lottery_data', JSON.stringify(data));
+                
+            } catch (error) {
+                console.error('Error saving to GitHub:', error);
+                // Fallback to localStorage
+                localStorage.setItem('lottery_data', JSON.stringify(data));
+                alert('Failed to save to GitHub. Data saved locally.');
+            }
+        }
+
+        // Check for updates (for non-admin users)
+        async function checkForUpdates() {
+            if (isAdminUnlocked) return; // Don't auto-refresh for admins
+            
+            try {
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE_PATH}`, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Authorization': `token ${GITHUB_TOKEN}`
+                    },
+                    cache: 'no-cache'
+                });
+
+                if (response.ok) {
+                    const fileData = await response.json();
+                    const content = atob(fileData.content);
+                    const data = JSON.parse(content);
+                    
+                    // Check if data has been updated
+                    if (data.lastModified && data.lastModified > lastUpdate) {
+                        loadDataFromObject(data);
+                        lastUpdate = data.lastModified;
+                        updateDisplay();
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking for updates:', error);
+            }
+        }
+
+        // Load data from localStorage as fallback
+        function loadDataFromLocalStorage() {
+            console.log('Loading data from localStorage as fallback');
+            const stored = localStorage.getItem('lottery_data');
+            if (stored) {
+                const data = JSON.parse(stored);
+                loadDataFromObject(data);
+            }
+        }
+
+        // Load data from object
+        function loadDataFromObject(data) {
+            members = data.members || [];
+            waitingList = data.waitingList || [];
+            winningNumbers = data.winningNumbers || [7, 12, 25, 33, 41, 55, 3, 8];
+            numbersHistory = data.numbersHistory || [];
+            currentWinnings = data.currentWinnings || 0;
+            winningsDate = data.winningsDate || '';
+            drawingDate = data.drawingDate || '';
+            currentWeekStart = data.currentWeekStart || new Date().toISOString().split('T')[0];
+            tickets = data.tickets || [];
+        }
+
+        // Admin functions
+        function toggleAdmin() {
+            if (!isAdminUnlocked) {
+                const password = prompt("Enter admin password:");
+                if (password === ADMIN_PASSWORD) {
+                    isAdminUnlocked = true;
+                    
+                    const adminSections = document.querySelectorAll('.admin-section');
+                    adminSections.forEach(section => {
+                        section.classList.add('unlocked');
+                    });
+                    
+                    const adminBtn = document.getElementById('adminBtn');
+                    const adminText = document.getElementById('adminText');
+                    adminBtn.classList.add('active');
+                    adminBtn.querySelector('span').textContent = "🔓";
+                    adminText.textContent = "Admin Active";
+                    
+                    // Stop auto-refresh when admin
+                    clearInterval(window.refreshInterval);
+                    
+                    updateDisplay();
+                    alert("Admin mode activated!");
+                } else if (password !== null) {
+                    alert("Incorrect password!");
+                }
+            } else {
+                isAdminUnlocked = false;
+                
+                const adminSections = document.querySelectorAll('.admin-section');
+                adminSections.forEach(section => {
+                    section.classList.remove('unlocked');
+                });
+                
+                const adminBtn = document.getElementById('adminBtn');
+                const adminText = document.getElementById('adminText');
+                adminBtn.classList.remove('active');
+                adminBtn.querySelector('span').textContent = "🔐";
+                adminText.textContent = "Admin";
+                
+                // Restart auto-refresh
+                window.refreshInterval = setInterval(checkForUpdates, 5000);
+                
+                updateDisplay();
+                alert("Admin mode deactivated!");
+            }
+        }
+
+        // Data manipulation functions
+        async function updateWinnings() {
+            const amount = parseFloat(document.getElementById('winningsInput').value);
+            const date = document.getElementById('winningsDateInput').value;
+            
+            if (isNaN(amount) || amount < 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            currentWinnings = amount;
+            winningsDate = date;
+            
+            updateWinningsDisplay();
+            await saveDataToGitHub();
+            
+            document.getElementById('winningsInput').value = '';
+            document.getElementById('winningsDateInput').value = '';
+            
+            alert('Winnings updated successfully!');
+        }
+
+        async function updateWinningNumbers() {
+            const nums = [
+                document.getElementById('num1').value,
+                document.getElementById('num2').value,
+                document.getElementById('num3').value,
+                document.getElementById('num4').value,
+                document.getElementById('num5').value,
+                document.getElementById('num6').value,
+                document.getElementById('num7').value,
+                document.getElementById('bonus').value
+            ];
+
+            const selectedDate = document.getElementById('drawingDate').value;
+
+            if (nums.some(num => num === '' || num < 1)) {
+                alert('Please enter all 8 numbers (7 regular + 1 bonus)');
+                return;
+            }
+
+            if (!selectedDate) {
+                alert('Please select a drawing date');
+                return;
+            }
+
+            for (let i = 0; i < 8; i++) {
+                if (nums[i] < 1 || nums[i] > 49) {
+                    alert('All numbers must be between 1 and 49');
+                    return;
+                }
+            }
+
+            // Save current numbers to history
+            if (winningNumbers.length === 8) {
+                const historyEntry = {
+                    numbers: [...winningNumbers],
+                    date: drawingDate || new Date().toLocaleDateString(),
+                    winnings: currentWinnings,
+                    timestamp: Date.now()
+                };
+                
+                numbersHistory.unshift(historyEntry);
+                if (numbersHistory.length > 10) {
+                    numbersHistory = numbersHistory.slice(0, 10);
+                }
+            }
+
+            // Update current numbers
+            winningNumbers = nums.map(num => parseInt(num));
+            drawingDate = selectedDate;
+            
+            displayWinningNumbers();
+            displayNumbersHistory();
+            updateDrawingDateDisplay();
+            await saveDataToGitHub();
+            
+            // Clear inputs
+            for (let i = 1; i <= 7; i++) {
+                document.getElementById('num' + i).value = '';
+            }
+            document.getElementById('bonus').value = '';
+            document.getElementById('drawingDate').value = '';
+            
+            alert('Winning numbers updated successfully!');
+        }
+
+        async function addMember() {
+            const name = document.getElementById('memberName').value.trim();
+            const email = document.getElementById('memberEmail').value.trim();
+            const phone = document.getElementById('memberPhone').value.trim();
+
+            if (!name) {
+                alert('Please enter a member name');
+                return;
+            }
+
+            const member = {
+                id: Date.now(),
+                name: name,
+                email: email || '',
+                phone: phone || '',
+                joinDate: new Date().toLocaleDateString(),
+                paidThisWeek: false,
+                weeklyPaymentHistory: { [currentWeekStart]: false }
+            };
+
+            members.push(member);
+            updateDisplay();
+            await saveDataToGitHub();
+            
+            // Clear inputs
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberEmail').value = '';
+            document.getElementById('memberPhone').value = '';
+            
+            alert('Member added successfully!');
+        }
+
+        async function addToWaitingList() {
+            const name = document.getElementById('waitingName').value.trim();
+            const email = document.getElementById('waitingEmail').value.trim();
+            const phone = document.getElementById('waitingPhone').value.trim();
+
+            if (!name) {
+                alert('Please enter a name');
+                return;
+            }
+
+            const person = {
+                id: Date.now(),
+                name: name,
+                email: email || '',
+                phone: phone || '',
+                addedDate: new Date().toLocaleDateString()
+            };
+
+            waitingList.push(person);
+            updateDisplay();
+            await saveDataToGitHub();
+            
+            // Clear inputs
+            document.getElementById('waitingName').value = '';
+            document.getElementById('waitingEmail').value = '';
+            document.getElementById('waitingPhone').value = '';
+            
+            alert('Person added to waiting list successfully!');
+        }
+
+        async function removeMember(id) {
+            if (!isAdminUnlocked) {
+                alert('Admin access required');
+                return;
+            }
+            if (confirm('Remove this member?')) {
+                members = members.filter(m => m.id !== id);
+                updateDisplay();
+                await saveDataToGitHub();
+            }
+        }
+
+        async function removeFromWaitingList(id) {
+            if (!isAdminUnlocked) {
+                alert('Admin access required');
+                return;
+            }
+            if (confirm('Remove from waiting list?')) {
+                waitingList = waitingList.filter(p => p.id !== id);
+                updateDisplay();
+                await saveDataToGitHub();
+            }
+        }
+
+        async function promoteToMember(id) {
+            if (!isAdminUnlocked) {
+                alert('Admin access required');
+                return;
+            }
+            const person = waitingList.find(p => p.id === id);
+            if (person) {
+                const member = {
+                    ...person,
+                    joinDate: new Date().toLocaleDateString(),
+                    paidThisWeek: false,
+                    weeklyPaymentHistory: { [currentWeekStart]: false }
+                };
+                members.push(member);
+                waitingList = waitingList.filter(p => p.id !== id);
+                updateDisplay();
+                await saveDataToGitHub();
+            }
+        }
+
+        async function togglePayment(memberId) {
+            const member = members.find(m => m.id === memberId);
+            if (member) {
+                member.paidThisWeek = !member.paidThisWeek;
+                if (!member.weeklyPaymentHistory) {
+                    member.weeklyPaymentHistory = {};
+                }
+                member.weeklyPaymentHistory[currentWeekStart] = member.paidThisWeek;
+                updateDisplay();
+                await saveDataToGitHub();
+            }
+        }
+
+        async function startNewWeek() {
+            if (confirm('Start new week? This resets all payment statuses.')) {
+                currentWeekStart = new Date().toISOString().split('T')[0];
+                members.forEach(member => {
+                    member.paidThisWeek = false;
+                });
+                updateDisplay();
+                updateWeekDisplay();
+                await saveDataToGitHub();
+                alert('New week started!');
+            }
+        }
+
+        async function moveUnpaidToWaiting() {
+            const unpaidMembers = members.filter(member => !member.paidThisWeek);
+            
+            if (unpaidMembers.length === 0) {
+                alert('All members have paid this week!');
+                return;
+            }
+
+            if (confirm(`Move ${unpaidMembers.length} unpaid member(s) to waiting list?`)) {
+                unpaidMembers.forEach(member => {
+                    const waitingEntry = {
+                        id: Date.now() + Math.random(),
+                        name: member.name,
+                        email: member.email,
+                        phone: member.phone,
+                        addedDate: new Date().toLocaleDateString(),
+                        previousMember: true,
+                        lastActiveDate: member.joinDate
+                    };
+                    waitingList.push(waitingEntry);
+                });
+                
+                members = members.filter(member => member.paidThisWeek);
+                updateDisplay();
+                await saveDataToGitHub();
+                alert(`${unpaidMembers.length} member(s) moved to waiting list.`);
+            }
+        }
+
+        async function markAllPaid() {
+            if (confirm('Mark all members as paid?')) {
+                members.forEach(member => {
+                    member.paidThisWeek = true;
+                    if (!member.weeklyPaymentHistory) {
+                        member.weeklyPaymentHistory = {};
+                    }
+                    member.weeklyPaymentHistory[currentWeekStart] = true;
+                });
+                updateDisplay();
+                await saveDataToGitHub();
+                alert('All members marked as paid!');
+            }
+        }
+
+        async function addTicket() {
+            const url = document.getElementById('ticketUrlInput').value.trim();
+            const week = document.getElementById('ticketWeekInput').value.trim();
+
+            if (!url || !week) {
+                alert('Please enter both URL and week');
+                return;
+            }
+
+            const ticket = {
+                id: Date.now(),
+                url: url,
+                week: week,
+                addedDate: new Date().toLocaleDateString(),
+                ticketNumber: tickets.length + 1
+            };
+
+            tickets.push(ticket);
+            displayTickets();
+            await saveDataToGitHub();
+
+            document.getElementById('ticketUrlInput').value = '';
+            document.getElementById('ticketWeekInput').value = '';
+
+            alert('Ticket added successfully!');
+        }
+
+        async function removeTicket(ticketId) {
+            if (!isAdminUnlocked) {
+                alert('Admin access required');
+                return;
+            }
+            
+            if (confirm('Remove this ticket?')) {
+                tickets = tickets.filter(ticket => ticket.id !== ticketId);
+                tickets.forEach((ticket, index) => {
+                    ticket.ticketNumber = index + 1;
+                });
+                displayTickets();
+                await saveDataToGitHub();
+            }
+        }
+
+        async function deleteHistoryEntry(index) {
+            if (!isAdminUnlocked) {
+                alert('Admin access required to delete history entries');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this drawing from history?')) {
+                numbersHistory.splice(index, 1);
+                displayNumbersHistory();
+                await saveDataToGitHub();
+                alert('Drawing deleted from history!');
+            }
+        }
+
+        // Export data to JSON file
+        function exportData() {
+            if (!isAdminUnlocked) {
+                alert('Admin access required to export data');
+                return;
+            }
+
+            const data = {
+                members: members,
+                waitingList: waitingList,
+                winningNumbers: winningNumbers,
+                numbersHistory: numbersHistory,
+                currentWinnings: currentWinnings,
+                winningsDate: winningsDate,
+                drawingDate: drawingDate,
+                currentWeekStart: currentWeekStart,
+                tickets: tickets,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `amico-ai-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            alert('✅ Data exported successfully! Save this file before updating the website.');
+        }
+
+        // Import data from JSON file
+        async function importData(event) {
+            if (!isAdminUnlocked) {
+                alert('Admin access required to import data');
+                return;
+            }
+
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate data structure
+                    if (data.members !== undefined && data.waitingList !== undefined && data.winningNumbers !== undefined) {
+                        members = data.members || [];
+                        waitingList = data.waitingList || [];
+                        winningNumbers = data.winningNumbers || [7, 12, 25, 33, 41, 55, 3, 8];
+                        numbersHistory = data.numbersHistory || [];
+                        currentWinnings = data.currentWinnings || 0;
+                        winningsDate = data.winningsDate || '';
+                        drawingDate = data.drawingDate || '';
+                        currentWeekStart = data.currentWeekStart || new Date().toISOString().split('T')[0];
+                        tickets = data.tickets || [];
+                        
+                        // Update displays and save to GitHub
+                        updateDisplay();
+                        await saveDataToGitHub();
+                        
+                        alert(`✅ Data imported successfully! Restored ${members.length} members, ${waitingList.length} waiting list entries, ${numbersHistory.length} historical draws, and ${tickets.length} tickets.`);
+                    } else {
+                        alert('❌ Invalid backup file format. Please select a valid Amico AI backup file.');
+                    }
+                } catch (error) {
+                    alert('❌ Error reading backup file. Please make sure it\'s a valid JSON file.');
+                    console.error('Import error:', error);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Display functions
+        function displayWinningNumbers() {
+            const container = document.getElementById('winningNumbers');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            winningNumbers.forEach((num, index) => {
+                const ball = document.createElement('div');
+                ball.className = 'number-ball';
+                if (index === 7) ball.classList.add('bonus');
+                ball.textContent = num.toString().padStart(2, '0');
+                container.appendChild(ball);
+            });
+        }
+
+        function displayMembers() {
+            const container = document.getElementById('memberList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+
+            if (members.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; font-style: italic; padding: 20px;">No members added yet. Admin can add members above.</p>';
+                return;
+            }
+
+            members.forEach(member => {
+                const card = document.createElement('div');
+                card.className = 'member-card';
+                
+                const contactInfo = isAdminUnlocked ? 
+                    `${member.email ? '✉️ ' + member.email + '<br>' : ''}
+                     ${member.phone ? '📞 ' + member.phone + '<br>' : ''}` : '';
+                
+                const paymentStatus = member.paidThisWeek ? 
+                    '<div class="payment-status paid">✅ PAID this week</div>' :
+                    '<div class="payment-status unpaid">❌ UNPAID this week</div>';
+                
+                const paymentControls = isAdminUnlocked ? 
+                    `<div class="payment-controls">
+                        <input type="checkbox" class="payment-checkbox" ${member.paidThisWeek ? 'checked' : ''} 
+                               data-member-id="${member.id}">
+                        <label class="payment-label">Paid this week</label>
+                    </div>` : '';
+                
+                card.innerHTML = `
+                    ${isAdminUnlocked ? '<button class="remove-btn" onclick="removeMember(' + member.id + ')">×</button>' : ''}
+                    <div class="member-name">${member.name}</div>
+                    <div class="member-info">
+                        ${contactInfo}
+                        📅 Joined: ${member.joinDate}
+                    </div>
+                    ${paymentStatus}
+                    ${paymentControls}
+                `;
+                
+                const checkbox = card.querySelector('.payment-checkbox');
+                if (checkbox) {
+                    checkbox.addEventListener('change', () => togglePayment(member.id));
+                }
+                
+                container.appendChild(card);
+            });
+        }
+
+        function displayWaitingList() {
+            const container = document.getElementById('waitingList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+
+            if (waitingList.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; font-style: italic; padding: 20px;">No one on waiting list. Admin can add people above.</p>';
+                return;
+            }
+
+            waitingList.forEach(person => {
+                const card = document.createElement('div');
+                card.className = 'member-card';
+                
+                const contactInfo = isAdminUnlocked ? 
+                    `${person.email ? '✉️ ' + person.email + '<br>' : ''}
+                     ${person.phone ? '📞 ' + person.phone + '<br>' : ''}` : '';
+                
+                card.innerHTML = `
+                    ${isAdminUnlocked ? '<button class="remove-btn" onclick="removeFromWaitingList(' + person.id + ')">×</button>' : ''}
+                    <div class="member-name">${person.name}</div>
+                    <div class="member-info">
+                        ${contactInfo}
+                        📅 Added: ${person.addedDate}
+                    </div>
+                    ${isAdminUnlocked ? '<button class="promote-btn" onclick="promoteToMember(' + person.id + ')">Promote to Member</button>' : ''}
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function displayTickets() {
+            const container = document.getElementById('ticketsGallery');
+            if (!container) return;
+            
+            container.innerHTML = '';
+
+            if (tickets.length === 0) {
+                container.innerHTML = `
+                    <div class="no-tickets" style="grid-column: 1 / -1;">
+                        <p>No tickets uploaded yet</p>
+                        <p style="font-size: 0.9em; opacity: 0.7;">Tickets will appear here once added by admin</p>
+                    </div>
+                `;
+                return;
+            }
+
+            tickets.forEach(ticket => {
+                const card = document.createElement('div');
+                card.className = 'ticket-card';
+                
+                const removeButton = isAdminUnlocked ? 
+                    `<button class="remove-ticket-btn" onclick="removeTicket(${ticket.id})">×</button>` : '';
+
+                card.innerHTML = `
+                    ${removeButton}
+                    <img class="ticket-image" src="${ticket.url}" alt="Ticket ${ticket.ticketNumber}" 
+                         onclick="openImageModal('${ticket.url}')" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                    <div style="display: none; padding: 20px; text-align: center; background: #f8f9fa;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🎫</div>
+                        <div>Image not available</div>
+                        <a href="${ticket.url}" target="_blank" style="color: #4CAF50;">View Original</a>
+                    </div>
+                    <div class="ticket-info">
+                        <div class="ticket-week">${ticket.week}</div>
+                        <div class="ticket-number">Ticket ${ticket.ticketNumber}</div>
+                        <div style="font-size: 0.8em; opacity: 0.7;">Added: ${ticket.addedDate}</div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function displayNumbersHistory() {
+            const container = document.getElementById('numbersHistory');
+            if (!container) return;
+            
+            container.innerHTML = '';
+
+            if (numbersHistory.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">No previous drawings yet</p>';
+                return;
+            }
+
+            numbersHistory.forEach((entry, index) => {
+                const historyDiv = document.createElement('div');
+                historyDiv.className = 'history-entry';
+                
+                const numbersDiv = document.createElement('div');
+                numbersDiv.className = 'history-numbers';
+                
+                entry.numbers.forEach((num, numIndex) => {
+                    const ball = document.createElement('div');
+                    ball.className = 'history-ball';
+                    if (numIndex === 7) ball.classList.add('bonus');
+                    ball.textContent = num.toString().padStart(2, '0');
+                    numbersDiv.appendChild(ball);
+                });
+
+                const infoDiv = document.createElement('div');
+                infoDiv.innerHTML = `
+                    <div>
+                        <div class="history-date">${entry.date}</div>
+                        <div class="history-winnings">${(entry.winnings || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                    </div>
+                    ${isAdminUnlocked ? `<button onclick="deleteHistoryEntry(${index})" style="
+                        background: #ff4757; 
+                        color: white; 
+                        border: none; 
+                        border-radius: 4px; 
+                        padding: 6px 12px; 
+                        cursor: pointer; 
+                        font-size: 0.8em;
+                        margin-left: 10px;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#ff3838'" onmouseout="this.style.background='#ff4757'">
+                        🗑️ Delete
+                    </button>` : ''}
+                `;
+
+                historyDiv.appendChild(numbersDiv);
+                historyDiv.appendChild(infoDiv);
+                container.appendChild(historyDiv);
+            });
+        }
+
+        function updateStats() {
+            const memberCountEl = document.getElementById('memberCount');
+            const waitingCountEl = document.getElementById('waitingCount');
+            const totalCountEl = document.getElementById('totalCount');
+            
+            if (memberCountEl) memberCountEl.textContent = members.length;
+            if (waitingCountEl) waitingCountEl.textContent = waitingList.length;
+            if (totalCountEl) totalCountEl.textContent = members.length + waitingList.length;
+        }
+
+        function updateWinningsDisplay() {
+            document.getElementById('currentWinnings').textContent = `${currentWinnings.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            if (winningsDate) {
+                const formattedDate = new Date(winningsDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                document.getElementById('winningsDate').textContent = `Won on: ${formattedDate}`;
+            } else {
+                document.getElementById('winningsDate').textContent = '';
+            }
+        }
+
+        function updateWeekDisplay() {
+            const weekElement = document.getElementById('currentWeek');
+            if (weekElement && currentWeekStart) {
+                const weekDate = new Date(currentWeekStart);
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                weekElement.textContent = `Current Week: ${weekDate.toLocaleDateString('en-US', options)}`;
+            }
+        }
+
+        function updateDrawingDateDisplay() {
+            const dateDisplay = document.getElementById('drawingDateDisplay');
+            if (dateDisplay) {
+                if (drawingDate) {
+                    const formattedDate = new Date(drawingDate).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                    dateDisplay.textContent = `Draw Date: ${formattedDate}`;
+                } else {
+                    dateDisplay.textContent = '';
+                }
+            }
+        }
+
+        function updateDisplay() {
+            displayMembers();
+            displayWaitingList();
+            updateStats();
+            displayWinningNumbers();
+            displayNumbersHistory();
+            displayTickets();
+            updateDrawingDateDisplay();
+            updateWinningsDisplay();
+        }
+
+        function openImageModal(imageUrl) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            modalImage.src = imageUrl;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup event listeners
+            document.getElementById('adminBtn').addEventListener('click', toggleAdmin);
+            document.getElementById('updateWinningsBtn').addEventListener('click', updateWinnings);
+            document.getElementById('updateNumbersBtn').addEventListener('click', updateWinningNumbers);
+            document.getElementById('addMemberBtn').addEventListener('click', addMember);
+            document.getElementById('addWaitingBtn').addEventListener('click', addToWaitingList);
+            document.getElementById('newWeekBtn').addEventListener('click', startNewWeek);
+            document.getElementById('moveUnpaidBtn').addEventListener('click', moveUnpaidToWaiting);
+            document.getElementById('markAllPaidBtn').addEventListener('click', markAllPaid);
+            document.getElementById('addTicketBtn').addEventListener('click', addTicket);
+            document.getElementById('closeModal').addEventListener('click', closeImageModal);
+            document.getElementById('importFile').addEventListener('change', importData);
+            
+            // Modal click outside to close
+            document.getElementById('imageModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeImageModal();
+                }
+            });
+            
+            // Initialize the app
+            init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "members": [],
+  "waitingList": [],
+  "winningNumbers": [7, 12, 25, 33, 41, 55, 3, 8],
+  "numbersHistory": [],
+  "currentWinnings": 0,
+  "winningsDate": "",
+  "drawingDate": "",
+  "currentWeekStart": "2025-01-01",
+  "tickets": [],
+  "lastModified": 0
+}
