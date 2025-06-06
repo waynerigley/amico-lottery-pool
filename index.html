@@ -839,9 +839,9 @@
         let tickets = [];
         let lastUpdate = 0;
         
-        const ADMIN_PASSWORD = "W*yneR*gley2025!!@";
-        const GITHUB_OWNER = "waynerigley"; // You'll need to replace this
-        const GITHUB_REPO = "amico-lottery-pool"; // You'll need to replace this
+        const ADMIN_PASSWORD_HASH = "3faa5632b76e8f2aeea64c829889116e782d5c51db7428013ef0b32f3b09449f";
+        const GITHUB_OWNER = "waynerigley";
+        const GITHUB_REPO = "amico-lottery-pool";
         const DATA_FILE_PATH = "data/lottery-data.json";
         const GITHUB_TOKEN = "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"; // You'll need to replace this
         
@@ -1021,10 +1021,19 @@
         }
 
         // Admin functions
-        function toggleAdmin() {
+        async function toggleAdmin() {
             if (!isAdminUnlocked) {
                 const password = prompt("Enter admin password:");
-                if (password === ADMIN_PASSWORD) {
+                
+                if (password === null) return; // User cancelled
+                
+                // Hash the input password
+                const msgBuffer = new TextEncoder().encode(password);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashedInput = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                
+                if (hashedInput === ADMIN_PASSWORD_HASH) {
                     isAdminUnlocked = true;
                     
                     const adminSections = document.querySelectorAll('.admin-section');
@@ -1043,7 +1052,7 @@
                     
                     updateDisplay();
                     alert("Admin mode activated!");
-                } else if (password !== null) {
+                } else {
                     alert("Incorrect password!");
                 }
             } else {
@@ -1237,7 +1246,7 @@
             if (confirm('Remove from waiting list?')) {
                 waitingList = waitingList.filter(p => p.id !== id);
                 updateDisplay();
-                await saveDataToGitHub();
+                await saveDataTo();
             }
         }
 
